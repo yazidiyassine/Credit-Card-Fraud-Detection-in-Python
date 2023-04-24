@@ -23,11 +23,19 @@ from matplotlib import gridspec
 
 # =============================================================================
 # # Download the dataset from the URL and save it to a file
+<<<<<<< HEAD
 #   ! url = "https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud?resource=download
 # =============================================================================
 
 # Read the dataset from the file
 dataset = pd.read_csv("C:\\Users\\Yassine Yazidi\\OneDrive\\Desktop\\Testing\\data\\creditcard.csv")
+=======
+"""!! url = "https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud?resource=download"""
+# =============================================================================
+
+# Read the dataset from the file
+dataset = pd.read_csv("creditcard.csv")
+>>>>>>> 80bc40498560ae252146bdafa00a7c91570492ab
 """
     ¤ Time :is measured in seconds since the first 
         transaction in the data collection.
