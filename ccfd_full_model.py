@@ -110,17 +110,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
-# %%
-# Using SKLEARN module for random forest
-from sklearn.ensemble import RandomForestClassifier 
-
 # Fit and predict
 rfc = RandomForestClassifier() 
 rfc.fit(X_train, y_train) 
 y_pred = rfc.predict(X_test)
-
-# For the performance let's use some metrics from SKLEARN module
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
   
 print("The accuracy is", accuracy_score(y_test, y_pred)) 
 print("The precision is", precision_score(y_test, y_pred))
