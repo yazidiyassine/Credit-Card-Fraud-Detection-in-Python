@@ -53,10 +53,6 @@ rfc = RandomForestClassifier()
 rfc.fit(dp.X_train, dp.Y_train)
 y_pred = rfc.predict(dp.x_test)
 
-
-# For the performance let's use some metrics from SKLEARN module
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
 print("The accuracy score is: ", accuracy_score(dp.y_test, y_pred))
 print("The precision score is: ", precision_score(dp.y_test, y_pred))
 print("The recall score is: ", recall_score(dp.y_test, y_pred))
@@ -103,10 +99,6 @@ or randomized search on a given estimator and its
 parameters with or without under/oversampling and
 returns the best estimator along with the performance
 metrics: """
-
-from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, cross_val_score
-from sklearn.metrics import recall_score, accuracy_score, f1_score, roc_curve, roc_auc_score
 def get_model_best_estimator_and_metrics(estimator, params, kf=kf, X_train=dp.X_train, 
                                          y_train=dp.Y_train, X_test=dp.x_test, 
                                          y_test=dp.y_test, is_grid_search=True, 
