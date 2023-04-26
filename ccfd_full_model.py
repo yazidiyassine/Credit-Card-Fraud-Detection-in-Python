@@ -1,147 +1,138 @@
+# %%
+# Importing modules 
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib import gridspec
 
-# Create the cross validation framework
+# %%
+#read the dataset
+dataset = pd.read_csv("C:\\Users\\Yassine Yazidi\\OneDrive\\Desktop\\Testing\\data\\creditcard.csv")
+# read the first 5 and last 5 rows of the data
+dataset.head().append(dataset.tail())
+
+# %%
+# check for relative proportion 
+print("Fraudulent Cases: " + str(len(dataset[dataset["Class"] == 1])))
+print("Valid Transactions: " + str(len(dataset[dataset["Class"] == 0])))
+print("Proportion of Fraudulent Cases: " + str(len(dataset[dataset["Class"] == 1])/ dataset.shape[0]))
+
+# To see how small are the number of Fraud transactions
+data_p = dataset.copy()
+data_p[" "] = np.where(data_p["Class"] == 1 ,  "Fraud", "Genuine")
+
+# plot a pie chart
+data_p[" "].value_counts().plot(kind="pie")
+
+# %%
+# plot the named features 
+f, axes = plt.subplots(1, 2, figsize=(18,4), sharex = True)
+
+amount_value = dataset['Amount'].values # values
+time_value = dataset['Time'].values # values
+
+sns.distplot(amount_value, hist=False, color="m", kde_kws={"shade": True}, ax=axes[0]).set_title('Distribution of Amount')
+sns.distplot(time_value, hist=False, color="m", kde_kws={"shade": True}, ax=axes[1]).set_title('Distribution of Time')
+
+plt.show()
+
+# %%
+print("Average Amount in a Fraudulent Transaction: " + str(dataset[dataset["Class"] == 1]["Amount"].mean()))
+print("Average Amount in a Valid Transaction: " + str(dataset[dataset["Class"] == 0]["Amount"].mean()))
+
+# %%
+print("Summary of the feature - Amount" + "\n-------------------------------")
+print(dataset["Amount"].describe())
+
+# %%
+# Reorder the columns Amount, Time then the rest
+data_plot = dataset.copy()
+amount = data_plot['Amount']
+data_plot.drop(labels=['Amount'], axis=1, inplace = True)
+data_plot.insert(0, 'Amount', amount)
+
+# Plot the distributions of the features
+columns = data_plot.iloc[:,0:30].columns
+plt.figure(figsize=(12,30*4))
+grids = gridspec.GridSpec(30, 1)
+for grid, index in enumerate(data_plot[columns]):
+ ax = plt.subplot(grids[grid])
+ sns.distplot(data_plot[index][data_plot.Class == 1], hist=False, kde_kws={"shade": True}, bins=50)
+ sns.distplot(data_plot[index][data_plot.Class == 0], hist=False, kde_kws={"shade": True}, bins=50)
+ ax.set_xlabel("")
+ ax.set_title("Distribution of Column: "  + str(index))
+plt.show()
+
+# %%
+# check for null values
+dataset.isnull().shape[0]
+print("Non-missing values: " + str(dataset.isnull().shape[0]))
+print("Missing values: " + str(dataset.shape[0] - dataset.isnull().shape[0]))
+
+# %%
+from sklearn.preprocessing import RobustScaler
+scaler = RobustScaler().fit(dataset[["Time", "Amount"]])
+dataset[["Time", "Amount"]] = scaler.transform(dataset[["Time", "Amount"]])
+
+dataset.head().append(dataset.tail())
+
+# %%
+# Separate response and features  Undersampling before cross validation will lead to overfiting
+y = dataset["Class"] # target 
+X = dataset.iloc[:,0:30]
+
+# Use SKLEARN for the split
+from sklearn.model_selection import train_test_split 
+X_train, X_test, y_train, y_test = train_test_split( 
+        X, y, test_size = 0.2, random_state = 42)
+
+X_train.shape, X_test.shape, y_train.shape, y_test.shape
+
+# %%
+# Create the cross validation framework 
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV, cross_val_score, RandomizedSearchCV
 
-""" Cross-validation framework: Stratified K-Fold cross-validation is created with k=5 (n_splits=5).
-This means the dataset will be split into 5 folds, and in each iteration, one fold will be used 
-for testing and the remaining folds for training the model. The shuffle parameter is set to False,
-which means the data will not be shuffled before splitting. """
-kf = StratifiedKFold(n_splits=5, random_state=None, shuffle=False)
+kf = StratifiedKFold(n_splits=5, random_state = None, shuffle = False)
 
-
+# %%
 # Import the imbalance Learn module
-""" 
-Importing the imblearn pipeline and resampling modules: imblearn 
-is a Python library for imbalanced learning, and it contains 
-several techniques for balancing datasets, such as under-sampling 
-and over-sampling. In this code, two techniques are imported: NearMiss 
-for under-sampling and SMOTE for over-sampling. A pipeline is also 
-created using these modules, which allows for chaining multiple
-estimators together.
-"""
-from imblearn.pipeline import Pipeline ## creates a pipeline using the provided estimators.
+from imblearn.pipeline import make_pipeline ## Create a Pipeline using the provided estimators .
 from imblearn.under_sampling import NearMiss  ## perform Under-sampling  based on NearMiss methods. 
-from imblearn.over_sampling import SMOTE ## PerformOver-sampling class that uses SMOTE.
-
-# import the metrics  
+from imblearn.over_sampling import SMOTE  ## PerformOver-sampling class that uses SMOTE. 
+# import the metrics
 from sklearn.metrics import roc_curve, roc_auc_score, accuracy_score, recall_score, precision_score, f1_score
-
-# import the classifiers
+# Import the classifiers
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.pipeline import make_pipeline
 
-# =============================================================================
-# 
-#      Building and Training the Model
-# 
-# =============================================================================
+# %%
+# Using SKLEARN module for random forest
+from sklearn.ensemble import RandomForestClassifier 
 
-import ccfd_data_preparation as dp
-"""
-A script named "ccfd_data_preparation" is imported, which 
-contains the preprocessed data split into training 
-and testing sets. A RandomForestClassifier is chosen
-as the model and is fitted on the training data, 
-and the predictions are made on the testing data.
-"""
-''' # Fit and Predict
-rfc = RandomForestClassifier()
-rfc.fit(dp.X_train, dp.Y_train)
-y_pred = rfc.predict(dp.x_test)
-
+# Fit and predict
+rfc = RandomForestClassifier() 
+rfc.fit(X_train, y_train) 
+y_pred = rfc.predict(X_test)
 
 # For the performance let's use some metrics from SKLEARN module
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+  
+print("The accuracy is", accuracy_score(y_test, y_pred)) 
+print("The precision is", precision_score(y_test, y_pred))
+print("The recall is", recall_score(y_test, y_pred))
+print("The F1 score is", f1_score(y_test, y_pred))
 
-print("The accuracy score is: ", accuracy_score(dp.y_test, y_pred))
-print("The precision score is: ", precision_score(dp.y_test, y_pred))
-print("The recall score is: ", recall_score(dp.y_test, y_pred))
-print("The f1 score is: ", f1_score(dp.y_test, y_pred))
- '''
-""" 
-The accuracy score is:  0.9996137776061234
-The precision score is:  0.975
-The recall score is:  0.7959183673469388     
-The f1 score is:  0.8764044943820225
-"""
-""" 
-we had only 0.17% fraud transactions, and a model
-predicting all transactions to be valid would 
-have an accuracy of 99.83%. Luckily, 
-our model exceeded that to over 99.96%.
-"""
-""" 
-¤ Precision: 
-        It is the total number of true positives divided by 
-        the true positives and false positives. Precision makes
-        sure we don't spot good transactions as fraudulent in our problem.
-        
-¤ Recall: 
-        It is the total number of true positives divided by the true positives
-        and false negatives. Recall assures we don't predict fraudulent transactions
-        as all good and therefore get good accuracy with a terrible model.
-        
-¤ F1 Score: 
-        It is the harmonic mean of precision and recall. It makes a good
-        average between both metrics.
- """
- 
- # =============================================================================
-# 
-#      Undersampling | NearMiss Methods
-# 
-# =============================================================================
-
-# perform undersampling on the training data
-
-""" making a flexible function that can perform grid 
-or randomized search on a given estimator and its 
-parameters with or without under/oversampling and
-returns the best estimator along with the performance
-metrics: """
-
-from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, cross_val_score
-from sklearn.metrics import recall_score, accuracy_score, f1_score, roc_curve, roc_auc_score
-
-
+# %%
 def get_model_best_estimator_and_metrics(estimator, params, kf=kf, X_train=X_train, 
                                          y_train=y_train, X_test=X_test, 
                                          y_test=y_test, is_grid_search=True, 
                                          sampling=NearMiss(), scoring="f1", 
                                          n_jobs=2):
-        
-    """
-    This function takes in the following parameters:
-    
-    Parameters:
-    ----------
-    estimator : object
-        The machine learning estimator to be used.
-    params : dict
-        The hyperparameters to be tuned.
-    kf : object
-        The cross-validation framework.
-    X_train : array-like
-        The training data.
-    y_train : array-like
-        The target variable for the training data.
-    X_test : array-like
-        The testing data.
-    y_test : array-like
-        The target variable for the testing data.
-    sampling : object, optional (default=None)
-        The sampling technique to be used.
-    scoring : str, optional (default='f1')
-        The evaluation metric to be used.
-    n_jobs : int, optional (default=2)
-        The number of CPU cores to use for parallel computing.
-    """
     if sampling is None:
         # make the pipeline of only the estimator, just so the remaining code will work fine
         pipeline = make_pipeline(estimator)
@@ -185,7 +176,7 @@ def get_model_best_estimator_and_metrics(estimator, params, kf=kf, X_train=X_tra
         "auc": auc,
     }
 
-import pandas as pd
+# %%
 # Cumulatively create a table for the ROC curve
 ## Create the dataframe
 res_table = pd.DataFrame(columns=['classifiers', 'fpr','tpr','auc'])
@@ -277,3 +268,38 @@ res_table = res_table.append({'classifiers': lin_reg_os_results["estimator_name"
                                         'tpr': lin_reg_os_results["tpr"], 
                                         'auc': lin_reg_os_results["auc"]
                               }, ignore_index=True)
+
+
+# %%
+# boxplot for two example variables in the dataset
+
+f, axes = plt.subplots(1, 2, figsize=(18,4), sharex = True)
+
+variable1 = dataset["V1"]
+variable2 = dataset["V2"]
+
+sns.boxplot(variable1, color="m", ax=axes[0]).set_title('Boxplot for V1')
+sns.boxplot(variable2, color="m", ax=axes[1]).set_title('Boxplot for V2')
+
+plt.show()
+
+# %%
+# Find the IQR for all the feature variables
+# Please note that we are keeping Class variable also in this evaluation, though we know using this method no observation
+# be removed based on this variable.
+
+quartile1 = dataset.quantile(0.25)
+quartile3 = dataset.quantile(0.75)
+
+IQR = quartile3 - quartile1
+print(IQR)
+
+# %%
+# Remove the outliers 
+constant = 3
+datavalid = dataset[~((dataset < (quartile1 - constant * IQR)) |(dataset > (quartile3 + constant * IQR))).any(axis=1)]
+deletedrows = dataset.shape[0] - datavalid.shape[0]
+print("We have removed " + str(deletedrows) + " rows from the data as outliers")
+
+
+# %%

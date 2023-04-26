@@ -13,7 +13,7 @@ import seaborn as sns
 from matplotlib import gridspec
 
 
-dataset = pd.read_csv("creditcard.csv")
+dataset = pd.read_csv("C:\\Users\\Yassine Yazidi\\OneDrive\\Desktop\\Testing\\data\\creditcard.csv")
 
 # =============================================================================
 # 
