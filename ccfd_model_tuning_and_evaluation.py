@@ -105,10 +105,6 @@ parameters with or without under/oversampling and
 returns the best estimator along with the performance
 metrics: """
 
-from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, cross_val_score
-from sklearn.metrics import recall_score, accuracy_score, f1_score, roc_curve, roc_auc_score
-
 
 def get_model_best_estimator_and_metrics(estimator, params, kf=kf, X_train=X_train, 
                                          y_train=y_train, X_test=X_test, 
