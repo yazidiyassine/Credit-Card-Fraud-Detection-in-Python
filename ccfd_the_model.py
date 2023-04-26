@@ -1,7 +1,6 @@
 
 # Create the cross validation framework
 from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import GridSearchCV, cross_val_score, RandomizedSearchCV
 
 """ Cross-validation framework: Stratified K-Fold cross-validation is created with k=5 (n_splits=5).
 This means the dataset will be split into 5 folds, and in each iteration, one fold will be used 
@@ -20,18 +19,9 @@ for under-sampling and SMOTE for over-sampling. A pipeline is also
 created using these modules, which allows for chaining multiple
 estimators together.
 """
-from imblearn.pipeline import Pipeline ## creates a pipeline using the provided estimators.
-from imblearn.under_sampling import NearMiss  ## perform Under-sampling  based on NearMiss methods. 
-from imblearn.over_sampling import SMOTE ## PerformOver-sampling class that uses SMOTE.
 
 # import the metrics  
-from sklearn.metrics import roc_curve, roc_auc_score, accuracy_score, recall_score, precision_score, f1_score
-
-# import the classifiers
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from sklearn.ensemble import RandomForestClassifier
 
 # =============================================================================

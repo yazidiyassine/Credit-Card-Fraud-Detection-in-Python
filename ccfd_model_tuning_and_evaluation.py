@@ -20,28 +20,16 @@ for under-sampling and SMOTE for over-sampling. A pipeline is also
 created using these modules, which allows for chaining multiple
 estimators together.
 """
-from imblearn.pipeline import Pipeline ## creates a pipeline using the provided estimators.
 from imblearn.under_sampling import NearMiss  ## perform Under-sampling  based on NearMiss methods. 
 from imblearn.over_sampling import SMOTE ## PerformOver-sampling class that uses SMOTE.
 
 # import the metrics  
-from sklearn.metrics import roc_curve, roc_auc_score, accuracy_score, recall_score, precision_score, f1_score
+from sklearn.metrics import roc_curve, roc_auc_score, accuracy_score, recall_score, f1_score
 
 # import the classifiers
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
-
-# =============================================================================
-# 
-#      Building and Training the Model
-# 
-# =============================================================================
-
-import ccfd_data_preparation as dp
 """
 A script named "ccfd_data_preparation" is imported, which 
 contains the preprocessed data split into training 

@@ -4,13 +4,7 @@ Created on Fri Apr 21 11:19:52 2023
 
 @author: Yassine Yazidi
 """
-
-# Importing modules
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib import gridspec
 
 
 dataset = pd.read_csv("C:\\Users\\Yassine Yazidi\\OneDrive\\Desktop\\Testing\\data\\creditcard.csv")
